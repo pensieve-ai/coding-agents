@@ -1,3 +1,4 @@
+import { dash } from "@better-auth/infra";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import type {
@@ -178,4 +179,6 @@ export const auth = betterAuth({
   onAPIError: {
     errorURL: "/",
   },
+
+  plugins: [dash()],
 });
