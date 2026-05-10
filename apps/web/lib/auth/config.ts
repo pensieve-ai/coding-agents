@@ -174,4 +174,8 @@ export const auth = betterAuth({
       generateId: () => nanoid(),
     },
   },
+
+  onAPIError: {
+    errorURL: "/",
+  },
 });

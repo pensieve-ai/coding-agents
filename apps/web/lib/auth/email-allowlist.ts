@@ -1,5 +1,7 @@
 import "server-only";
 
+import { APIError } from "better-auth/api";
+
 const RAW_ALLOWED_DOMAINS = process.env.AUTH_ALLOWED_EMAIL_DOMAINS ?? "";
 const RAW_ALLOWED_EMAILS = process.env.AUTH_ALLOWED_EMAILS ?? "";
 
@@ -14,12 +16,15 @@ const ALLOWED_EMAILS = RAW_ALLOWED_EMAILS.split(",")
 const ALLOW_ALL =
   ALLOWED_DOMAINS.includes("*") || ALLOWED_EMAILS.includes("*");
 
-export class EmailNotAllowedError extends Error {
+export class EmailNotAllowedError extends APIError {
+  readonly attemptedEmail: string | undefined | null;
+
   constructor(email: string | undefined | null) {
-    super(
-      `Sign-in is restricted. Email "${email ?? "(unknown)"}" is not on the allowlist.`,
-    );
+    super("FORBIDDEN", {
+      message: "EMAIL_NOT_ALLOWED",
+    });
     this.name = "EmailNotAllowedError";
+    this.attemptedEmail = email;
   }
 }
 
