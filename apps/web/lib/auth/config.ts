@@ -5,6 +5,8 @@ import type {
   VercelProfile,
 } from "better-auth/social-providers";
 import { nanoid } from "nanoid";
+import { assertEmailAllowed } from "@/lib/auth/email-allowlist";
+import { googleSocialProvider } from "@/lib/auth/google-provider";
 import { deriveAuthUsername } from "@/lib/auth/username";
 import { db } from "@/lib/db/client";
 import * as schema from "@/lib/db/schema";
@@ -126,11 +128,14 @@ export const auth = betterAuth({
   databaseHooks: {
     user: {
       create: {
-        before: async (user) => ({
-          data: {
-            username: deriveAuthUsername(user),
-          },
-        }),
+        before: async (user) => {
+          assertEmailAllowed(user.email);
+          return {
+            data: {
+              username: deriveAuthUsername(user),
+            },
+          };
+        },
       },
     },
   },
@@ -161,6 +166,7 @@ export const auth = betterAuth({
       clientSecret: process.env.GITHUB_CLIENT_SECRET ?? "",
       mapProfileToUser: mapGitHubProfileToUser,
     },
+    ...googleSocialProvider,
   },
 
   advanced: {
